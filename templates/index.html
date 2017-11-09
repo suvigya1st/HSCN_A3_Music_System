@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Audio Player with Responsive Playlist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="static/style/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="column center">
+        <h1>HTML5 Audio Player</h1>
+        <h6>w/ responsive playlist</h6>
+    </div>
+    <div class="column add-bottom">
+        <div id="mainwrap">
+            <div id="nowPlay">
+                <span class="left" id="npAction">Paused...</span>
+                <span class="right" id="npTitle"></span>
+            </div>
+            <div id="audiowrap">
+                <div id="audio0">
+                    <audio preload id="audio1" controls>Your browser does not support HTML5 Audio!</audio>
+                    
+                </div>
+                <
+                <div id="tracks">
+                    <a id="btnPrev">&laquo;</a>
+                    <a id="btnNext">&raquo;</a>
+                </div>
+            </div>
+            <div id="plwrap">
+                <ul id="plList"></ul>
+            </div>
+        </div>
+    </div>
+    
+</div>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js'></script>
+<script src='http://api.html5media.info/1.1.8/html5media.min.js'></script>
+
+
+    <script>
+
+      // html5media enables <video> and <audio> tags in all major browsers
+// External File: https://api.html5media.info/1.1.8/html5media.min.js
+
+
+// Add user agent as an attribute on the <html> tag...
+// Inspiration: https://css-tricks.com/ie-10-specific-styles/
+var b = document.documentElement;
+b.setAttribute('data-useragent', navigator.userAgent);
+b.setAttribute('data-platform', navigator.platform);
+
+
+// HTML5 audio player + playlist controls...
+// Inspiration: http://jonhall.info/how_to/create_a_playlist_for_html5_audio
+// Mythium Archive: https://archive.org/details/mythium/
+$(document).ready(function(){
+
+   // jQuery methods go here...
+
+
+jQuery(function ($) {
+    var xhr = new XMLHttpRequest()
+    var supportsAudio = !!document.createElement('audio').canPlayType;
+    if (supportsAudio) {
+        var index = {{currentTrackInfo}},
+            playing = false,
+            extension = '',
+            tracks = {{tracklist}},
+            currentTimeTimer = setInterval(function (){
+                $.post("/tracktime/" + audio.currentTime);
+                console.log("Track time posted");
+            },5000),
+            
+            
+            buildPlaylist = $.each(tracks, function(key, value) {
+                var trackNumber = value.track,
+                    trackName = value.name,
+                    trackLength = value.length;
+                if (trackNumber.toString().length === 1) {
+                    trackNumber = '0' + trackNumber;
+                } else {
+                    trackNumber = '' + trackNumber;
+                }
+                $('#plList').append('<li><div class="plItem"><div class="plNum">' + trackNumber + '.</div><div class="plTitle">' + trackName + '</div><div class="plLength">' + trackLength + '</div></div></li>');
+            }),
+            trackCount = tracks.length,
+            npAction = $('#npAction'),
+            npTitle = $('#npTitle'),
+            
+            
+            audio=document.getElementById('audio1');
+            audio.currentTime={{currentTrackTime}};
+            audio.addEventListener("play",play);
+            audio.addEventListener("pause",pause);
+            audio.addEventListener("ended",ended);
+            function play(){
+                playing = true;
+                $.post("/action/play/"+audio.currentTime.toString())
+                
+                console.log("played");
+                npAction.text('Now Playing...');
+            }
+            function pause(){
+                playing = false;
+                $.post("/action/pause/"+index.toString())
+                console.log("paused");
+                npAction.text('Paused...');
+            }
+            function ended(){
+                npAction.text('Paused...');
+                if ((index + 1) < trackCount) {
+                    index++;
+                    loadTrack(index);
+                    audio.play();
+                } else {
+                    audio.pause();
+                    index = 0;
+                    loadTrack(index);
+                }
+            }
+            
+            btnPrev = $('#btnPrev').click(function () {
+                if ((index - 1) > -1) {
+                    index--;
+                    loadTrack(index);
+                    if (playing) {
+                        audio.play();
+                    }
+                } else {
+                    audio.pause();
+                    index = 0;
+                    loadTrack(index);
+                }
+            }),
+            btnNext = $('#btnNext').click(function () {
+                if ((index + 1) < trackCount) {
+                    index++;
+                    loadTrack(index);
+                    if (playing) {
+                        audio.play();
+                    }
+                } else {
+                    audio.pause();
+                    index = 0;
+                    loadTrack(index);
+                }
+            }),
+            li = $('#plList li').click(function () {
+                var id = parseInt($(this).index());
+                if (id !== index) {
+                    playTrack(id);
+                }
+            }),
+            loadTrack = function (id) {
+                $('.plSel').removeClass('plSel');
+                $('#plList li:eq(' + id + ')').addClass('plSel');
+                npTitle.text(tracks[id].name);
+                index = id;
+                audio.src = '/media/'+id;
+                $.get('/media/'+tracks[id].name)
+                document.title=tracks[id].name
+            },
+            playTrack = function (id) {
+                loadTrack(id);
+                //audio.dispatchEvent('play')
+                audio.play();
+            };
+        extension = audio.canPlayType('audio/mpeg') ? '.mp3' : audio.canPlayType('audio/ogg') ? '.ogg' : '';
+        loadTrack(index);
+    }
+});
+});
+    </script>
+
+</body>
+</html>

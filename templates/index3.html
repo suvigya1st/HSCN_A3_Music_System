@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body{ background:#666; }
+button{ border:none; cursor:pointer; outline:none; }
+input{ outline:none; }
+button#playpausebtn{
+	background:"static/images/pause.png no-repeat";
+	width:12px;
+	height:14px;
+}
+button#mutebtn{
+	background:"static/images/speaker.png no-repeat";
+	width:5px;
+	height:14px;
+}
+input#seekslider{
+	width:200px;
+}
+input#volumeslider{
+	width: 70px;
+}
+input[type='range'] {
+    -webkit-appearance: none !important;
+	margin:0px;
+	padding:0px;
+    background: #000;
+    height:13px;
+	border-bottom:#333 1px solid;
+}
+input[type='range']::-ms-fill-lower  {
+	background:#000;
+}
+input[type='range']::-ms-fill-upper  {
+	background:#000;
+}
+input[type='range']::-moz-range-track {
+	border:none;
+    background: #000;
+}
+input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    background: radial-gradient(#FFF, #333);
+    height:11px;
+    width:11px;
+	border-radius:100%;
+	cursor:pointer;
+}
+input[type='range']::-moz-range-thumb {
+    background: radial-gradient(#FFF, #333);
+    height:11px;
+    width:11px;
+	border-radius:100%;
+	cursor:pointer;
+}
+input[type='range']::-ms-thumb {
+    -webkit-appearance: none !important;
+    background: radial-gradient(#FFF, #333);
+    height:11px;
+    width:11px;
+	border-radius:100%;
+	cursor:pointer;
+}
+</style>
+<script type = "text/javascript" 
+         src = "{{ url_for('static', filename = 'audioscript.js') }}" ></script>
+</head>
+<body>
+<button id="playpausebtn"></button>
+<input id="seekslider" type="range" min="0" max="200" value="0" step="1">
+<button id="mutebtn"></button>
+<input id="volumeslider" type="range" min="0" max="100" value="100" step="1">
+</body>
+</html>
